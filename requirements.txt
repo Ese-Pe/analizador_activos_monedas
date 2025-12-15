@@ -1,0 +1,24 @@
+# Flask Web Server
+Flask==3.0.0
+Werkzeug==3.0.1
+
+# Scheduler
+APScheduler==3.10.4
+pytz==2023.3
+
+# Data Processing
+requests==2.31.0
+pandas==2.1.4
+numpy==1.26.2
+
+# Technical Analysis
+ta==0.11.0
+
+# Telegram Bot
+python-telegram-bot==20.7
+
+# Date handling
+python-dateutil==2.8.2
+
+# Production server
+gunicorn==21.2.0

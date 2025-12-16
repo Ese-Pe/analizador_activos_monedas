@@ -8,8 +8,8 @@ pytz==2024.1
 
 # Data Processing
 requests==2.31.0
-pandas==2.2.0
-numpy==1.26.4
+pandas==2.1.4
+numpy==1.26.2
 
 # Technical Analysis
 ta==0.11.0

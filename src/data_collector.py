@@ -13,7 +13,13 @@ import pandas as pd
 
 logger = logging.getLogger(__name__)
 
-REQUEST_DELAY = 3.0  # Seconds between API calls
+REQUEST_DELAY = 6.0  # Seconds between API calls (increased for rate limit)
+
+# Headers to avoid rate limiting
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+    'Accept': 'application/json'
+}
 
 
 class CoinGeckoDataAgent:
@@ -40,7 +46,7 @@ class CoinGeckoDataAgent:
         }
         
         try:
-            response = requests.get(url, params=params, timeout=30)
+            response = requests.get(url, params=params, headers=HEADERS, timeout=30)
             response.raise_for_status()
             coins = response.json()
             logger.info(f"✓ Fetched {len(coins)} coins")
@@ -57,7 +63,7 @@ class CoinGeckoDataAgent:
         for attempt in range(max_retries):
             try:
                 time.sleep(REQUEST_DELAY)
-                response = requests.get(url, params=params, timeout=30)
+                response = requests.get(url, params=params, headers=HEADERS, timeout=30)
                 
                 if response.status_code == 429:
                     wait_time = REQUEST_DELAY * (attempt + 2)
@@ -94,7 +100,7 @@ class CoinGeckoDataAgent:
         
         try:
             time.sleep(REQUEST_DELAY)
-            response = requests.get(url, timeout=30)
+            response = requests.get(url, headers=HEADERS, timeout=30)
             response.raise_for_status()
             data = response.json()['data']
             
@@ -125,7 +131,7 @@ class CoinGeckoDataAgent:
         excluded = ['USDT', 'USDC', 'DAI', 'BUSD', 'USDS', 'USDE', 'PYUSD', 'TUSD', 'FDUSD', 'USDT0', 'BSC-USD']
         
         tradeable_coins = [c for c in coins if c['symbol'].upper() not in excluded]
-        coins_to_process = min(25, len(tradeable_coins))
+        coins_to_process = min(15, len(tradeable_coins))  # Reduced from 25 to 15
         
         logger.info(f"Processing {coins_to_process} tradeable coins...")
         

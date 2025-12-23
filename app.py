@@ -107,10 +107,10 @@ def run_crypto_analysis():
 # Initialize scheduler
 scheduler = BackgroundScheduler(timezone=pytz.timezone('Europe/Madrid'))
 
-# Schedule jobs: # Todos los días a las 9:00 AM CET
+# Schedule jobs: # Todos los días a las 9:30 AM CET
 scheduler.add_job(
     func=run_crypto_analysis,
-    trigger=CronTrigger(hour=9, minute=0, timezone='Europe/Madrid'),
+    trigger=CronTrigger(hour=9, minute=30, timezone='Europe/Madrid'),
     id='daily_analysis',
     name='Daily Crypto Analysis',
     replace_existing=True

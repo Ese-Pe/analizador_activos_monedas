@@ -116,6 +116,15 @@ scheduler.add_job(
     replace_existing=True
 )
 
+# Keep-alive ping cada 10 minutos para evitar que Render pause el servicio
+scheduler.add_job(
+    func=lambda: logger.info("⏰ Keep-alive ping"),
+    trigger='interval',
+    minutes=10,
+    id='keep_alive',
+    name='Keep Alive'
+)
+
 # Start scheduler
 scheduler.start()
 logger.info("✅ Scheduler started successfully")

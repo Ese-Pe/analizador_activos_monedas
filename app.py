@@ -223,6 +223,40 @@ def test_telegram():
             "message": str(e)
         }), 500
 
+@app.route('/trigger/daily_analysis')
+def trigger_daily_analysis():
+    """Endpoint para ejecutar manualmente el análisis diario"""
+    try:
+        logger.info("🔴 Trigger manual del análisis diario")
+        run_daily_analysis()
+        return jsonify({
+            "status": "success",
+            "message": "Análisis diario ejecutado correctamente",
+            "timestamp": datetime.now().isoformat()
+        })
+    except Exception as e:
+        logger.error(f"❌ Error en trigger manual: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "message": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+@app.route('/trigger/keep_alive')
+def trigger_keep_alive():
+    """Endpoint para ver el keep-alive"""
+    try:
+        keep_alive()
+        return jsonify({
+            "status": "success",
+            "message": "Keep-alive ejecutado",
+            "timestamp": datetime.now().isoformat()
+        })
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
 
 if __name__ == '__main__':
     # Get port from environment (Render provides this)

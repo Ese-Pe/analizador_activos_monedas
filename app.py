@@ -5,6 +5,7 @@ Main application with scheduler and health checks
 
 import os
 import logging
+import requests
 from flask import Flask, jsonify
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -30,6 +31,33 @@ app = Flask(__name__)
 
 # Global variables for status tracking
 last_run = {"time": None, "status": "Never run", "signals": 0}
+
+# URL del servicio para auto-ping (se configura después de iniciar)
+SERVICE_URL = os.environ.get('RENDER_EXTERNAL_URL', None)
+
+
+def keep_alive():
+    """
+    Función de keep-alive que hace un auto-ping HTTP al servicio.
+    Esto es necesario para mantener activos los servicios gratuitos de Render
+    que se duermen tras 15 minutos de inactividad.
+    """
+    try:
+        if SERVICE_URL:
+            response = requests.get(f"{SERVICE_URL}/health", timeout=10)
+            logger.info(f"⏰ Keep-alive ping exitoso: {response.status_code}")
+        else:
+            # Fallback: ping a localhost si no hay URL externa
+            port = int(os.environ.get('PORT', 10000))
+            response = requests.get(f"http://localhost:{port}/health", timeout=10)
+            logger.info(f"⏰ Keep-alive ping (local) exitoso: {response.status_code}")
+    except Exception as e:
+        logger.warning(f"⚠️ Keep-alive ping falló: {e}")
+
+
+def run_daily_analysis():
+    """Alias para run_crypto_analysis para mantener compatibilidad"""
+    return run_crypto_analysis()
 
 
 def run_crypto_analysis():
@@ -117,8 +145,9 @@ scheduler.add_job(
 )
 
 # Keep-alive ping cada 10 minutos para evitar que Render pause el servicio
+# Usa la función keep_alive() que hace un auto-ping HTTP real al servicio
 scheduler.add_job(
-    func=lambda: logger.info("⏰ Keep-alive ping"),
+    func=keep_alive,
     trigger='interval',
     minutes=10,
     id='keep_alive',
